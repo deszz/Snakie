@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -29,10 +30,12 @@ namespace Snakie
         public bool IsDestroyed
         { get; private set; }
 
-        public void Destroy()
+        public void Destroy(bool force = false)
         {
-            OnDestroy();
-            IsDestroyed = true;
+            bool canceled = false;
+            OnDestroy(ref canceled);
+
+            IsDestroyed = !canceled || force;
         }
 
         protected virtual void OnEnabled() { }

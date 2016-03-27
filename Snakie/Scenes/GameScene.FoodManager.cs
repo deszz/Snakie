@@ -72,7 +72,7 @@ namespace Snakie.Scenes
             foreach (var food in GetAllFoodObjects())
             {
                 if (food.IsExpired)
-                    RemoveFromScene(food);
+                    food.Destroy();
             }
         }
 
@@ -115,7 +115,7 @@ namespace Snakie.Scenes
                 ApplyBonus(food.Bonus);
 
             FoodEaten?.Invoke(this, new FoodEatenEventArgs(food));
-            RemoveFromScene(food);
+            food.Destroy();
         }
 
         private void ApplyBonus(Bonus bonus)

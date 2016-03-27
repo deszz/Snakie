@@ -15,5 +15,9 @@ namespace Snakie
         public virtual void OnDraw(SpriteBatch sBatch) { }
 
         public virtual void OnDestroy() { }
+        public virtual void OnDestroy(ref bool cancel)
+        {
+            OnDestroy();
+        }
     }
 }

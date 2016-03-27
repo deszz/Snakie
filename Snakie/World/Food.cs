@@ -10,6 +10,8 @@ namespace Snakie.World
 {
     public class Food : GameObject
     {
+        private const float animationTime = 0.25f; // in seconds
+
         private static Color[] colorsList = { Color.Red/*, Color.Blue,
                                               Color.Green*/ };
 
@@ -43,6 +45,9 @@ namespace Snakie.World
         private Rectangle rect;
         private Rectangle collider;
         private Texture2D texture;
+
+        private bool destroying;
+        private bool destroyed;
 
         public Food(FoodType type, Point position)
         {
@@ -85,19 +90,49 @@ namespace Snakie.World
             }
         }
 
-        public override void OnDraw(SpriteBatch sBatch)
+        public override void OnUpdate()
         {
-            if (alpha < 1)
+            var factor = GetFactor();
+
+            if (destroying)
             {
-                sBatch.Draw(texture, rect, new Color(color, alpha));
-                alpha += 4f * App.FrameTime;
+                if (alpha > 0)
+                {
+                    rect = ResizeRect(rect, factor);
+                    alpha -= factor;
+                }
+                else
+                {
+                    destroyed = true;
+                }
             }
             else
             {
-                sBatch.Draw(texture, rect, color);
+                if (alpha < 1)
+                    alpha += factor;
             }
 
+            base.OnUpdate();
+        }
+
+        public override void OnDraw(SpriteBatch sBatch)
+        {
+            sBatch.Draw(texture, rect, new Color(color, alpha));
+
             base.OnDraw(sBatch);
+        }
+
+        public override void OnDestroy(ref bool cancel)
+        {
+            if (destroyed)
+                return;
+
+            cancel = true;
+            if (!destroying)
+            {
+                destroying = true;
+                collider = Rectangle.Empty;
+            }
         }
 
         private Color GetRandomColor()
@@ -108,6 +143,19 @@ namespace Snakie.World
         private Texture2D GetRandomFigureTexture()
         {
             return App.LoadRes<Texture2D>("World/Food/" + ("Figure_" + App.GetRandom(1, 4)));
+        }
+
+        private float GetFactor()
+        {
+            return (1 / animationTime) * App.FrameTime;
+        }
+
+        private Rectangle ResizeRect(Rectangle rect, float factor)
+        {
+            return new Rectangle(rect.X - (int)((rect.Width * factor) / 2),
+                                 rect.Y - (int)((rect.Height * factor) / 2),
+                                 rect.Width + (int)(rect.Width * factor),
+                                 rect.Height + (int)(rect.Height * factor));
         }
     }
 }

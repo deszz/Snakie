@@ -59,7 +59,6 @@ namespace Snakie
                 throw new ArgumentNullException(nameof(gameObject));
 
             gameObject.Destroy();
-            sceneObjects.Remove(gameObject);
         }
     }
 }
